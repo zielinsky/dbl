@@ -268,6 +268,10 @@ let intersect_module_info ~check_schemes ~pp ~pos name info1 info2 =
       Some info1)
 
 let intersect ?check_schemes ~pp ~pos ~scope penv1 penv2 =
+  (* Or-patterns with existential types are not supported YET *)
+  if not (T.TVar.Map.is_empty penv1.tvar_tab) ||
+     not (T.TVar.Map.is_empty penv2.tvar_tab) then
+    Error.report (Error.or_pattern_existential_type ~pos);
   let ren =
     Name.Map.fold (fun name info2 ren ->
       match Name.Map.find_opt name penv1.val_map with
